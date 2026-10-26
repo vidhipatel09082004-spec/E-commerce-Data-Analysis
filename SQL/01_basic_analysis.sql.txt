@@ -1,0 +1,997 @@
+
+
+Q1 Total Orders
+SELECT COUNT(*) FROM orders;
++----------+
+| count(*) |
++----------+
+|    10000 |
++----------+
+
+
+ Q2 Total Customers
+SELECT COUNT(*) FROM customers;
++----------+
+| count(*) |
++----------+
+|     2000 |
++----------+
+
+ Q3 Total Products
+SELECT COUNT(*) FROM products;
++----------+
+| count(*) |
++----------+
+|      100 |
++----------+
+
+Q4 Total Quantity Sold
+SELECT SUM(quantity) FROM orders;
++---------------+
+| sum(quantity) |
++---------------+
+|         19268 |
++---------------+
+
+Q5 Show the order ID, customer ID, customer name, and 
+city for the first 10 orders.
+
+SELECT  orders.order_id, orders.customer_id, customers.customer_name,
+customers.city
+FROM orders
+JOIN customers
+ON orders.customer_id = customers.customer_id
+LIMIT 10;
++----------+-------------+---------------+-----------+
+| order_id | customer_id | customer_name | city      |
++----------+-------------+---------------+-----------+
+| O02315   | C0001       | Customer_0001 | Chennai   |
+| O02558   | C0001       | Customer_0001 | Chennai   |
+| O02819   | C0001       | Customer_0001 | Chennai   |
+| O04327   | C0001       | Customer_0001 | Chennai   |
+| O07082   | C0001       | Customer_0001 | Chennai   |
+| O09047   | C0001       | Customer_0001 | Chennai   |
+| O09203   | C0001       | Customer_0001 | Chennai   |
+| O09480   | C0001       | Customer_0001 | Chennai   |
+| O03165   | C0002       | Customer_0002 | Bengaluru |
+| O00187   | C0003       | Customer_0003 | Jaipur    |
++----------+-------------+---------------+-----------+
+
+Q6 What is the total revenue generated from all orders?
+
+SELECT SUM(orders.quantity * products.price) AS total_revenue
+FROM orders
+JOIN products
+ON orders.product_id = products.product_id;
+
++---------------+
+| total_revenue |
++---------------+
+|   72067144.37 |
++---------------+
+
+Q7 Which product category generates the most revenue?
+SELECT
+products.category,
+SUM(orders.quantity * products.price) AS total_revenue
+FROM orders
+JOIN products
+ON orders.product_id = products.product_id
+GROUP BY products.category
+ORDER BY total_revenue DESC;
+
++----------------+---------------+
+| category       | total_revenue |
++----------------+---------------+
+| Fashion        |   20503756.90 |
+| Beauty         |   18619954.64 |
+| Home & Kitchen |   11301647.07 |
+| Electronics    |    9963364.73 |
+| Books          |    6420996.00 |
+| Sports         |    5257425.03 |
++----------------+---------------+
+
+Q8 Which 10 products generated the highest revenue?
+
+SELECT
+    products.product_id,
+    products.product_name,
+    SUM(orders.quantity * products.price) AS total_revenue
+FROM orders
+JOIN products
+    ON orders.product_id = products.product_id
+GROUP BY
+    products.product_id,
+    products.product_name
+ORDER BY total_revenue DESC
+LIMIT 10;
+
++------------+--------------+---------------+
+| product_id | product_name | total_revenue |
++------------+--------------+---------------+
+| P077       | Product_077  |    5734166.76 |
+| P092       | Product_092  |    4945328.94 |
+| P042       | Product_042  |    2878792.22 |
+| P053       | Product_053  |    2523406.20 |
+| P052       | Product_052  |    2443377.86 |
+| P099       | Product_099  |    2124822.00 |
+| P048       | Product_048  |    1865559.91 |
+| P064       | Product_064  |    1727313.40 |
+| P026       | Product_026  |    1539999.36 |
+| P078       | Product_078  |    1440123.26 |
++------------+--------------+---------------+
+
+q9 How much revenue did the company generate each month?
+
+SELECT
+    YEAR(orders.order_date) AS year,
+    MONTH(orders.order_date) AS month,
+    SUM(orders.quantity * products.price) AS total_revenue
+FROM orders
+JOIN products
+    ON orders.product_id = products.product_id
+GROUP BY
+    YEAR(orders.order_date),
+    MONTH(orders.order_date)
+ORDER BY
+    year,
+    month;
++------+-------+---------------+
+| year | month | total_revenue |
++------+-------+---------------+
+| 2025 |     1 |    6316601.12 |
+| 2025 |     2 |    6097242.64 |
+| 2025 |     3 |    6552378.33 |
+| 2025 |     4 |    5608396.96 |
+| 2025 |     5 |    6213179.69 |
+| 2025 |     6 |    5474608.48 |
+| 2025 |     7 |    5679519.33 |
+| 2025 |     8 |    6045590.65 |
+| 2025 |     9 |    5389995.88 |
+| 2025 |    10 |    6898504.36 |
+| 2025 |    11 |    5671533.77 |
+| 2025 |    12 |    6119593.16 |
++------+-------+---------------+
+
+Q10 Which city has the highest number of customers?
+
+SELECT
+    city,
+    COUNT(*) AS total_customers
+FROM customers
+GROUP BY city
+ORDER BY total_customers DESC;
+
++-----------+-----------------+
+| city      | total_customers |
++-----------+-----------------+
+| Ahmedabad |             224 |
+| Pune      |             208 |
+| Kolkata   |             208 |
+| Delhi     |             205 |
+| Jaipur    |             200 |
+| Mumbai    |             196 |
+| Surat     |             194 |
+| Chennai   |             193 |
+| Hyderabad |             191 |
+| Bengaluru |             181 |
++-----------+-----------------+
+
+Q11 Which payment method do customers use the most?
+
+SELECT
+    payment_method,
+    COUNT(*) AS total_orders
+FROM orders
+GROUP BY payment_method
+ORDER BY total_orders DESC;
+
++------------------+--------------+
+| payment_method   | total_orders |
++------------------+--------------+
+| UPI              |         3838 |
+| Credit Card      |         2501 |
+| Debit Card       |         1774 |
+| Cash on Delivery |         1401 |
+| Net Banking      |          486 |
++------------------+--------------+
+
+Q12 How many orders were Delivered, Cancelled, Returned, and Pending?
+
+SELECT
+    status,
+    COUNT(*) AS total_orders
+FROM orders
+GROUP BY status
+ORDER BY total_orders DESC;
+
++-----------+--------------+
+| status    | total_orders |
++-----------+--------------+
+| Delivered |         7835 |
+| Cancelled |          807 |
+| Pending   |          697 |
+| Returned  |          661 |
++-----------+--------------+
+
+Q13 How many orders were Delivered, Cancelled, Returned, and Pending in percentage?
+
+SELECT
+    status,
+    COUNT(*) AS total_orders,
+    ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM orders), 2) AS percentage
+FROM orders
+GROUP BY status
+ORDER BY percentage DESC;
+
++-----------+--------------+------------+
+| status    | total_orders | percentage |
++-----------+--------------+------------+
+| Delivered |         7835 |      78.35 |
+| Cancelled |          807 |       8.07 |
+| Pending   |          697 |       6.97 |
+| Returned  |          661 |       6.61 |
++-----------+--------------+------------+
+
+Q14 Which 10 customers generated the most revenue?
+
+SELECT
+    customers.customer_id,
+    customers.customer_name,
+    SUM(orders.quantity * products.price) AS total_spending
+FROM customers
+JOIN orders
+    ON customers.customer_id = orders.customer_id
+JOIN products
+    ON orders.product_id = products.product_id
+GROUP BY
+    customers.customer_id,
+    customers.customer_name
+ORDER BY total_spending DESC
+LIMIT 10;
+
++-------------+---------------+----------------+
+| customer_id | customer_name | total_spending |
++-------------+---------------+----------------+
+| C1917       | Customer_1917 |      251911.33 |
+| C1469       | Customer_1469 |      184858.37 |
+| C0713       | Customer_0713 |      174657.20 |
+| C0778       | Customer_0778 |      167553.28 |
+| C0038       | Customer_0038 |      165662.35 |
+| C1110       | Customer_1110 |      162672.47 |
+| C1807       | Customer_1807 |      162281.12 |
+| C1888       | Customer_1888 |      153120.47 |
+| C0959       | Customer_0959 |      150434.98 |
+| C1523       | Customer_1523 |      148101.76 |
++-------------+---------------+----------------+
+
+Q15 On average, how much money does a customer spend on one order?
+
+SELECT
+    ROUND(
+        SUM(orders.quantity * products.price) / COUNT(DISTINCT orders.order_id),
+        2
+    ) AS average_order_value
+FROM orders
+JOIN products
+    ON orders.product_id = products.product_id;
+
++---------------------+
+| average_order_value |
++---------------------+
+|             7206.71 |
++---------------------+
+
+Q16 How many customers placed more than ten order?
+
+SELECT
+    customer_id,
+    COUNT(*) AS total_orders
+FROM orders
+GROUP BY customer_id
+HAVING COUNT(*) > 10;
+
++-------------+--------------+
+| customer_id | total_orders |
++-------------+--------------+
+| C0019       |           11 |
+| C0271       |           11 |
+| C0387       |           11 |
+| C0396       |           12 |
+| C0416       |           11 |
+| C0429       |           12 |
+| C0434       |           11 |
+| C0464       |           11 |
+| C0503       |           11 |
+| C0528       |           13 |
+| C0639       |           13 |
+| C0849       |           12 |
+| C1093       |           11 |
+| C1097       |           11 |
+| C1117       |           12 |
+| C1136       |           11 |
+| C1231       |           11 |
+| C1261       |           11 |
+| C1270       |           11 |
+| C1379       |           11 |
+| C1463       |           11 |
+| C1625       |           11 |
+| C1807       |           14 |
+| C1809       |           11 |
+| C1823       |           11 |
+| C1938       |           11 |
++-------------+--------------+
+
+Q17 What percentage of customers are repeat customers?
+
+SELECT
+    ROUND(
+        (
+            COUNT(*) * 100.0 /
+            (SELECT COUNT(*) FROM customers)
+        ),
+        2
+    ) AS retention_rate
+FROM (
+    SELECT
+        customer_id
+    FROM orders
+    GROUP BY customer_id
+    HAVING COUNT(*) > 1
+) AS repeat_customers;
+
++----------------+
+| retention_rate |
++----------------+
+|          96.10 |
++----------------+
+
+Q18 Which category has the highest number of units sold?
+
+SELECT
+    products.category,
+    SUM(orders.quantity) AS total_units_sold
+FROM orders
+JOIN products
+    ON orders.product_id = products.product_id
+GROUP BY products.category
+ORDER BY total_units_sold DESC;
+
++----------------+------------------+
+| category       | total_units_sold |
++----------------+------------------+
+| Fashion        |             5868 |
+| Electronics    |             3737 |
+| Home & Kitchen |             3328 |
+| Beauty         |             2759 |
+| Books          |             2062 |
+| Sports         |             1514 |
++----------------+------------------+
+
+Q19 What is the average product price in each category?
+
+SELECT
+    category,
+    ROUND(AVG(price), 2) AS average_price
+FROM products
+GROUP BY category
+ORDER BY average_price DESC;
+
++----------------+---------------+
+| category       | average_price |
++----------------+---------------+
+| Beauty         |       6540.34 |
+| Home & Kitchen |       3567.18 |
+| Sports         |       3524.33 |
+| Fashion        |       3510.96 |
+| Books          |       3157.52 |
+| Electronics    |       2601.67 |
++----------------+---------------+
+
+Q20 Which product has sold the most units?
+
+SELECT
+    products.product_id,
+    products.product_name,
+    SUM(orders.quantity) AS total_units_sold
+FROM orders
+JOIN products
+    ON orders.product_id = products.product_id
+GROUP BY
+    products.product_id,
+    products.product_name
+ORDER BY total_units_sold DESC
+LIMIT 1;
+
++------------+--------------+------------------+
+| product_id | product_name | total_units_sold |
++------------+--------------+------------------+
+| P015       | Product_015  |              253 |
++------------+--------------+------------------+
+
+Q21 How much revenue did we generate on each day?
+
+SELECT
+    orders.order_date,
+    SUM(orders.quantity * products.price) AS daily_revenue
+FROM orders
+JOIN products
+    ON orders.product_id = products.product_id
+GROUP BY orders.order_date
+ORDER BY orders.order_date;
++------------+---------------+
+| order_date | daily_revenue |
++------------+---------------+
+| 2025-01-01 |     305468.02 |
+| 2025-01-02 |     225689.78 |
+| 2025-01-03 |     190502.71 |
+| 2025-01-04 |     164968.87 |
+| 2025-01-05 |     153212.13 |
+| 2025-01-06 |     141144.35 |
+| 2025-01-07 |     179991.61 |
+| 2025-01-08 |     245433.38 |
+| 2025-01-09 |     165015.15 |
+| 2025-01-10 |     210100.35 |
+| 2025-01-11 |     271946.97 |
+| 2025-01-12 |     211680.87 |
+| 2025-01-13 |     329607.31 |
+| 2025-01-14 |     180721.16 |
+| 2025-01-15 |     113617.34 |
+| 2025-01-16 |     202985.59 |
+| 2025-01-17 |     374506.88 |
+| 2025-01-18 |     314852.59 |
+| 2025-01-19 |     169873.84 |
+| 2025-01-20 |     232227.92 |
+| 2025-01-21 |     223798.04 |
+| 2025-01-22 |     101969.00 |
+| 2025-01-23 |     275395.71 |
+| 2025-01-24 |     179081.58 |
+| 2025-01-25 |     125178.89 |
+| 2025-01-26 |     174830.09 |
+| 2025-01-27 |     184668.05 |
+| 2025-01-28 |     201963.18 |
+| 2025-01-29 |     145781.73 |
+| 2025-01-30 |     155125.76 |
+| 2025-01-31 |     165262.27 |
+| 2025-02-01 |     235044.14 |
+| 2025-02-02 |     268036.31 |
+| 2025-02-03 |     196039.72 |
+| 2025-02-04 |     318226.96 |
+| 2025-02-05 |     213297.84 |
+| 2025-02-06 |     249466.17 |
+| 2025-02-07 |     164269.27 |
+| 2025-02-08 |     194181.69 |
+| 2025-02-09 |     229183.77 |
+| 2025-02-10 |     236225.78 |
+| 2025-02-11 |     186877.07 |
+| 2025-02-12 |     194740.36 |
+| 2025-02-13 |     234092.75 |
+| 2025-02-14 |     176171.86 |
+| 2025-02-15 |     250794.75 |
+| 2025-02-16 |     177293.95 |
+| 2025-02-17 |     132175.43 |
+| 2025-02-18 |     268274.91 |
+| 2025-02-19 |     111257.84 |
+| 2025-02-20 |     283543.02 |
+| 2025-02-21 |     286463.52 |
+| 2025-02-22 |     148276.61 |
+| 2025-02-23 |     231344.30 |
+| 2025-02-24 |     214716.34 |
+| 2025-02-25 |     195861.65 |
+| 2025-02-26 |     299555.00 |
+| 2025-02-27 |     158792.38 |
+| 2025-02-28 |     243039.25 |
+| 2025-03-01 |     188581.92 |
+| 2025-03-02 |     252255.57 |
+| 2025-03-03 |     216383.99 |
+| 2025-03-04 |     230553.49 |
+| 2025-03-05 |     321470.79 |
+| 2025-03-06 |     124027.24 |
+| 2025-03-07 |     154700.99 |
+| 2025-03-08 |     217650.71 |
+| 2025-03-09 |     205469.70 |
+| 2025-03-10 |     275857.05 |
+| 2025-03-11 |     167276.12 |
+| 2025-03-12 |     210016.96 |
+| 2025-03-13 |     160575.82 |
+| 2025-03-14 |     220884.26 |
+| 2025-03-15 |     291816.31 |
+| 2025-03-16 |     146755.01 |
+| 2025-03-17 |     183832.01 |
+| 2025-03-18 |     320134.00 |
+| 2025-03-19 |     156122.73 |
+| 2025-03-20 |     111344.71 |
+| 2025-03-21 |     277990.88 |
+| 2025-03-22 |     203937.19 |
+| 2025-03-23 |     200819.84 |
+| 2025-03-24 |     144491.72 |
+| 2025-03-25 |     321607.93 |
+| 2025-03-26 |     248316.73 |
+| 2025-03-27 |     188065.36 |
+| 2025-03-28 |     257598.22 |
+| 2025-03-29 |     195127.86 |
+| 2025-03-30 |     204199.74 |
+| 2025-03-31 |     154513.48 |
+| 2025-04-01 |     103860.70 |
+| 2025-04-02 |     248761.96 |
+| 2025-04-03 |     193688.82 |
+| 2025-04-04 |     232706.81 |
+| 2025-04-05 |     151292.66 |
+| 2025-04-06 |     198051.76 |
+| 2025-04-07 |     211705.70 |
+| 2025-04-08 |     194786.93 |
+| 2025-04-09 |      99694.15 |
+| 2025-04-10 |     141704.65 |
+| 2025-04-11 |     158858.66 |
+| 2025-04-12 |     106087.60 |
+| 2025-04-13 |     208202.76 |
+| 2025-04-14 |     209605.93 |
+| 2025-04-15 |     309144.55 |
+| 2025-04-16 |     123098.29 |
+| 2025-04-17 |     304050.86 |
+| 2025-04-18 |     135489.38 |
+| 2025-04-19 |     116707.62 |
+| 2025-04-20 |     165978.77 |
+| 2025-04-21 |     210622.21 |
+| 2025-04-22 |     209161.56 |
+| 2025-04-23 |     116581.91 |
+| 2025-04-24 |     254637.02 |
+| 2025-04-25 |     173870.43 |
+| 2025-04-26 |     268480.39 |
+| 2025-04-27 |     251952.57 |
+| 2025-04-28 |     155414.96 |
+| 2025-04-29 |     136135.49 |
+| 2025-04-30 |     218061.86 |
+| 2025-05-01 |     149683.06 |
+| 2025-05-02 |     190156.38 |
+| 2025-05-03 |     195099.55 |
+| 2025-05-04 |     168844.94 |
+| 2025-05-05 |     115988.59 |
+| 2025-05-06 |     160524.96 |
+| 2025-05-07 |     122805.41 |
+| 2025-05-08 |     221421.58 |
+| 2025-05-09 |     153071.29 |
+| 2025-05-10 |     253893.49 |
+| 2025-05-11 |     147309.49 |
+| 2025-05-12 |     182144.88 |
+| 2025-05-13 |     185220.37 |
+| 2025-05-14 |     238647.48 |
+| 2025-05-15 |     261017.12 |
+| 2025-05-16 |     273443.01 |
+| 2025-05-17 |     124723.74 |
+| 2025-05-18 |     168961.33 |
+| 2025-05-19 |     319511.44 |
+| 2025-05-20 |     223716.65 |
+| 2025-05-21 |     257351.74 |
+| 2025-05-22 |     201168.93 |
+| 2025-05-23 |     284864.33 |
+| 2025-05-24 |     212679.89 |
+| 2025-05-25 |     234223.49 |
+| 2025-05-26 |     183747.77 |
+| 2025-05-27 |     214725.51 |
+| 2025-05-28 |     165634.37 |
+| 2025-05-29 |     206603.21 |
+| 2025-05-30 |     170661.97 |
+| 2025-05-31 |     225333.72 |
+| 2025-06-01 |     156188.71 |
+| 2025-06-02 |     287264.20 |
+| 2025-06-03 |     146464.72 |
+| 2025-06-04 |     147073.94 |
+| 2025-06-05 |     291631.73 |
+| 2025-06-06 |     206972.62 |
+| 2025-06-07 |     152550.06 |
+| 2025-06-08 |     172600.64 |
+| 2025-06-09 |     174145.30 |
+| 2025-06-10 |     170199.49 |
+| 2025-06-11 |     155474.22 |
+| 2025-06-12 |     248274.64 |
+| 2025-06-13 |     105679.70 |
+| 2025-06-14 |     233137.29 |
+| 2025-06-15 |     226614.70 |
+| 2025-06-16 |     215715.58 |
+| 2025-06-17 |     105747.73 |
+| 2025-06-18 |     293326.75 |
+| 2025-06-19 |      77112.10 |
+| 2025-06-20 |     156208.51 |
+| 2025-06-21 |     224307.13 |
+| 2025-06-22 |     226223.63 |
+| 2025-06-23 |     228877.19 |
+| 2025-06-24 |     162242.24 |
+| 2025-06-25 |     112400.19 |
+| 2025-06-26 |     184952.73 |
+| 2025-06-27 |     184273.35 |
+| 2025-06-28 |     156834.32 |
+| 2025-06-29 |     103040.79 |
+| 2025-06-30 |     169074.28 |
+| 2025-07-01 |     181065.43 |
+| 2025-07-02 |     171984.16 |
+| 2025-07-03 |     246646.33 |
+| 2025-07-04 |     115165.97 |
+| 2025-07-05 |     331260.33 |
+| 2025-07-06 |     133552.01 |
+| 2025-07-07 |     138906.80 |
+| 2025-07-08 |     251055.31 |
+| 2025-07-09 |     137451.68 |
+| 2025-07-10 |     232407.32 |
+| 2025-07-11 |     109526.90 |
+| 2025-07-12 |     188715.24 |
+| 2025-07-13 |     140961.39 |
+| 2025-07-14 |     289026.58 |
+| 2025-07-15 |     266829.35 |
+| 2025-07-16 |     125886.12 |
+| 2025-07-17 |     167871.98 |
+| 2025-07-18 |     203709.19 |
+| 2025-07-19 |     159986.47 |
+| 2025-07-20 |     215651.03 |
+| 2025-07-21 |     179458.62 |
+| 2025-07-22 |     217041.65 |
+| 2025-07-23 |      83875.46 |
+| 2025-07-24 |     126932.10 |
+| 2025-07-25 |     111016.74 |
+| 2025-07-26 |     202784.14 |
+| 2025-07-27 |     122893.52 |
+| 2025-07-28 |     296312.48 |
+| 2025-07-29 |     239972.24 |
+| 2025-07-30 |     116551.29 |
+| 2025-07-31 |     175021.50 |
+| 2025-08-01 |      89169.37 |
+| 2025-08-02 |     215834.40 |
+| 2025-08-03 |     143477.05 |
+| 2025-08-04 |     215652.88 |
+| 2025-08-05 |     324312.53 |
+| 2025-08-06 |      86927.29 |
+| 2025-08-07 |     373308.39 |
+| 2025-08-08 |     267251.95 |
+| 2025-08-09 |     171962.22 |
+| 2025-08-10 |     125062.19 |
+| 2025-08-11 |     127559.10 |
+| 2025-08-12 |     202094.65 |
+| 2025-08-13 |     289095.60 |
+| 2025-08-14 |     111520.28 |
+| 2025-08-15 |     166975.29 |
+| 2025-08-16 |     131527.92 |
+| 2025-08-17 |     242179.49 |
+| 2025-08-18 |     142691.63 |
+| 2025-08-19 |     134768.22 |
+| 2025-08-20 |     260288.38 |
+| 2025-08-21 |     227894.72 |
+| 2025-08-22 |     229384.35 |
+| 2025-08-23 |     110856.27 |
+| 2025-08-24 |      63675.83 |
+| 2025-08-25 |     298625.92 |
+| 2025-08-26 |     125816.15 |
+| 2025-08-27 |     365941.20 |
+| 2025-08-28 |     197022.43 |
+| 2025-08-29 |     163145.14 |
+| 2025-08-30 |     165607.58 |
+| 2025-08-31 |     275962.23 |
+| 2025-09-01 |     192087.22 |
+| 2025-09-02 |     192360.31 |
+| 2025-09-03 |     213341.87 |
+| 2025-09-04 |     174872.11 |
+| 2025-09-05 |     193979.56 |
+| 2025-09-06 |     140390.37 |
+| 2025-09-07 |     187560.16 |
+| 2025-09-08 |      49963.99 |
+| 2025-09-09 |     207350.53 |
+| 2025-09-10 |     306102.47 |
+| 2025-09-11 |     134009.30 |
+| 2025-09-12 |     188949.14 |
+| 2025-09-13 |     220808.60 |
+| 2025-09-14 |     167154.47 |
+| 2025-09-15 |     183355.52 |
+| 2025-09-16 |     298658.69 |
+| 2025-09-17 |     228961.09 |
+| 2025-09-18 |     110538.80 |
+| 2025-09-19 |     170162.29 |
+| 2025-09-20 |     165337.78 |
+| 2025-09-21 |     161561.65 |
+| 2025-09-22 |     173017.61 |
+| 2025-09-23 |     219043.93 |
+| 2025-09-24 |     145074.10 |
+| 2025-09-25 |     110504.17 |
+| 2025-09-26 |     109044.07 |
+| 2025-09-27 |     178333.45 |
+| 2025-09-28 |     194076.06 |
+| 2025-09-29 |     248937.16 |
+| 2025-09-30 |     124459.41 |
+| 2025-10-01 |     192658.35 |
+| 2025-10-02 |     222257.80 |
+| 2025-10-03 |     123261.56 |
+| 2025-10-04 |     212253.88 |
+| 2025-10-05 |     291364.63 |
+| 2025-10-06 |     245945.83 |
+| 2025-10-07 |     343324.00 |
+| 2025-10-08 |     124320.85 |
+| 2025-10-09 |     243752.46 |
+| 2025-10-10 |     210673.56 |
+| 2025-10-11 |     263855.86 |
+| 2025-10-12 |     179752.65 |
+| 2025-10-13 |     146443.96 |
+| 2025-10-14 |     345443.80 |
+| 2025-10-15 |     215807.50 |
+| 2025-10-16 |     273221.05 |
+| 2025-10-17 |      98353.00 |
+| 2025-10-18 |     128223.78 |
+| 2025-10-19 |     341314.18 |
+| 2025-10-20 |     206701.52 |
+| 2025-10-21 |     200756.12 |
+| 2025-10-22 |     205086.14 |
+| 2025-10-23 |     158483.89 |
+| 2025-10-24 |     183951.61 |
+| 2025-10-25 |     281552.54 |
+| 2025-10-26 |      81723.38 |
+| 2025-10-27 |     373786.59 |
+| 2025-10-28 |     273515.37 |
+| 2025-10-29 |     269917.61 |
+| 2025-10-30 |     227178.98 |
+| 2025-10-31 |     233621.91 |
+| 2025-11-01 |     206721.54 |
+| 2025-11-02 |     212419.92 |
+| 2025-11-03 |     116915.20 |
+| 2025-11-04 |     131848.95 |
+| 2025-11-05 |     187577.42 |
+| 2025-11-06 |     241661.38 |
+| 2025-11-07 |     279095.40 |
+| 2025-11-08 |     275343.80 |
+| 2025-11-09 |      90658.30 |
+| 2025-11-10 |     130733.15 |
+| 2025-11-11 |     154492.47 |
+| 2025-11-12 |     301422.62 |
+| 2025-11-13 |     145686.20 |
+| 2025-11-14 |     151942.49 |
+| 2025-11-15 |     224067.84 |
+| 2025-11-16 |     114153.84 |
+| 2025-11-17 |     118174.76 |
+| 2025-11-18 |     214080.60 |
+| 2025-11-19 |     169048.98 |
+| 2025-11-20 |     240438.14 |
+| 2025-11-21 |     130235.81 |
+| 2025-11-22 |     216647.90 |
+| 2025-11-23 |     355212.80 |
+| 2025-11-24 |     281938.36 |
+| 2025-11-25 |     174330.31 |
+| 2025-11-26 |     161542.30 |
+| 2025-11-27 |     100559.79 |
+| 2025-11-28 |     174895.12 |
+| 2025-11-29 |     156503.15 |
+| 2025-11-30 |     213185.23 |
+| 2025-12-01 |     147099.11 |
+| 2025-12-02 |     188054.70 |
+| 2025-12-03 |     327279.75 |
+| 2025-12-04 |     210079.81 |
+| 2025-12-05 |     169679.56 |
+| 2025-12-06 |     235221.65 |
+| 2025-12-07 |     168582.58 |
+| 2025-12-08 |     230386.02 |
+| 2025-12-09 |     126913.84 |
+| 2025-12-10 |     156661.63 |
+| 2025-12-11 |     219361.60 |
+| 2025-12-12 |     152481.70 |
+| 2025-12-13 |     153342.46 |
+| 2025-12-14 |     178393.39 |
+| 2025-12-15 |     132724.59 |
+| 2025-12-16 |     137572.16 |
+| 2025-12-17 |     308019.79 |
+| 2025-12-18 |     219316.85 |
+| 2025-12-19 |     129856.66 |
+| 2025-12-20 |     200093.38 |
+| 2025-12-21 |     194964.98 |
+| 2025-12-22 |     181602.84 |
+| 2025-12-23 |     231563.47 |
+| 2025-12-24 |     237327.59 |
+| 2025-12-25 |     290573.61 |
+| 2025-12-26 |     144288.21 |
+| 2025-12-27 |     205933.24 |
+| 2025-12-28 |     159958.52 |
+| 2025-12-29 |     159366.34 |
+| 2025-12-30 |     344704.85 |
+| 2025-12-31 |     178188.28 |
++------------+---------------+
+
+Q22 Which single day generated the highest revenue?
+
+SELECT
+    orders.order_date,
+    SUM(orders.quantity * products.price) AS daily_revenue
+FROM orders
+JOIN products
+    ON orders.product_id = products.product_id
+GROUP BY orders.order_date
+ORDER BY daily_revenue DESC
+LIMIT 1;
+
++------------+---------------+
+| order_date | daily_revenue |
++------------+---------------+
+| 2025-01-17 |     374506.88 |
++------------+---------------+
+
+Q23 Which day generated the lowest revenue?
+
+
+SELECT
+    orders.order_date,
+    SUM(orders.quantity * products.price) AS daily_revenue
+FROM orders
+JOIN products
+    ON orders.product_id = products.product_id
+GROUP BY orders.order_date
+ORDER BY daily_revenue ASC
+LIMIT 1;
+
++------------+---------------+
+| order_date | daily_revenue |
++------------+---------------+
+| 2025-09-08 |      49963.99 |
++------------+---------------+
+
+Q24 Which payment method generates the most revenue?
+
+SELECT
+    orders.payment_method,
+    SUM(orders.quantity * products.price) AS total_revenue
+FROM orders
+JOIN products
+    ON orders.product_id = products.product_id
+GROUP BY orders.payment_method
+ORDER BY total_revenue DESC;
+
++------------------+---------------+
+| payment_method   | total_revenue |
++------------------+---------------+
+| UPI              |   27567038.45 |
+| Credit Card      |   17641500.42 |
+| Debit Card       |   12866161.31 |
+| Cash on Delivery |   10195772.63 |
+| Net Banking      |    3796671.56 |
++------------------+---------------+
+
+Q25 Which city generates the most revenue?
+
+SELECT
+    customers.city,
+    SUM(orders.quantity * products.price) AS total_revenue
+FROM customers
+JOIN orders
+    ON customers.customer_id = orders.customer_id
+JOIN products
+    ON orders.product_id = products.product_id
+GROUP BY customers.city
+ORDER BY total_revenue DESC;
+
++-----------+---------------+
+| city      | total_revenue |
++-----------+---------------+
+| Ahmedabad |    8539106.49 |
+| Pune      |    8300717.76 |
+| Kolkata   |    8138616.34 |
+| Hyderabad |    7065423.60 |
+| Mumbai    |    6948599.79 |
+| Jaipur    |    6760801.56 |
+| Chennai   |    6729406.65 |
+| Surat     |    6676979.27 |
+| Bengaluru |    6676704.21 |
+| Delhi     |    6230788.70 |
++-----------+---------------+
+
+Q26 Which customers placed the most orders?
+
+SELECT
+    customers.customer_id,
+    customers.customer_name,
+    COUNT(orders.order_id) AS total_orders
+FROM customers
+JOIN orders
+    ON customers.customer_id = orders.customer_id
+GROUP BY
+    customers.customer_id,
+    customers.customer_name
+ORDER BY total_orders DESC
+LIMIT 10;
+
++-------------+---------------+--------------+
+| customer_id | customer_name | total_orders |
++-------------+---------------+--------------+
+| C1807       | Customer_1807 |           14 |
+| C0639       | Customer_0639 |           13 |
+| C0528       | Customer_0528 |           13 |
+| C0396       | Customer_0396 |           12 |
+| C0429       | Customer_0429 |           12 |
+| C0849       | Customer_0849 |           12 |
+| C1117       | Customer_1117 |           12 |
+| C0503       | Customer_0503 |           11 |
+| C0464       | Customer_0464 |           11 |
+| C0019       | Customer_0019 |           11 |
++-------------+---------------+--------------+
+
+Q27 On average, how many units are included in each order?
+
+SELECT
+ROUND(AVG(quantity), 2) AS average_quantity_per_order
+FROM orders;
++----------------------------+
+| average_quantity_per_order |
++----------------------------+
+|                       1.93 |
++----------------------------+
+
+Q28 Which state generates the most revenue?
+
+SELECT
+    customers.state,
+    SUM(orders.quantity * products.price) AS total_revenue
+FROM customers
+JOIN orders
+    ON customers.customer_id = orders.customer_id
+JOIN products
+    ON orders.product_id = products.product_id
+GROUP BY customers.state
+ORDER BY total_revenue DESC;
+
++-------------+---------------+
+| state       | total_revenue |
++-------------+---------------+
+| Maharashtra |   15249317.55 |
+| Gujarat     |   15216085.76 |
+| West Bengal |    8138616.34 |
+| Telangana   |    7065423.60 |
+| Rajasthan   |    6760801.56 |
+| Tamil Nadu  |    6729406.65 |
+| Karnataka   |    6676704.21 |
+| Delhi       |    6230788.70 |
++-------------+---------------+
+
+Q29 What percentage of orders were cancelled?
+
+SELECT
+    ROUND(
+    SUM(CASE WHEN status = 'Cancelled' THEN 1 ELSE 0 END)
+    * 100.0 / COUNT(*),
+    2) AS cancellation_rate
+FROM orders;
+
++-------------------+
+| cancellation_rate |
++-------------------+
+|              8.07 |
++-------------------+
+
+Q30 How many customers have placed 1, 2, 3, 4, etc. orders?
+
+SELECT
+    total_orders,
+    COUNT(*) AS number_of_customers
+FROM (
+    SELECT
+        customer_id,
+        COUNT(order_id) AS total_orders
+    FROM orders
+    GROUP BY customer_id
+) AS customer_order_count
+GROUP BY total_orders
+ORDER BY total_orders;
+
++--------------+---------------------+
+| total_orders | number_of_customers |
++--------------+---------------------+
+|            1 |                  63 |
+|            2 |                 161 |
+|            3 |                 319 |
+|            4 |                 342 |
+|            5 |                 335 |
+|            6 |                 281 |
+|            7 |                 190 |
+|            8 |                 150 |
+|            9 |                  78 |
+|           10 |                  40 |
+|           11 |                  19 |
+|           12 |                   4 |
+|           13 |                   2 |
+|           14 |                   1 |
++--------------+---------------------+
+
+
+
+
+
